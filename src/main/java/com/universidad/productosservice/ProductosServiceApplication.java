@@ -1,4 +1,4 @@
-package com.universidad.productos_service;
+package com.universidad.productosservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,5 +9,4 @@ public class ProductosServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ProductosServiceApplication.class, args);
 	}
-
 }
