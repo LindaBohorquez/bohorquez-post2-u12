@@ -1,7 +1,7 @@
 # productos-service
 
-Microservicio Spring Boot para gestionar productos y practicar pruebas unitarias
-con JUnit 5 y Mockito.
+Microservicio Spring Boot para gestionar productos y practicar pruebas unitarias,
+validacion arquitectonica con ArchUnit y documentacion de decisiones con ADR.
 
 ## Tecnologias
 
@@ -11,23 +11,25 @@ con JUnit 5 y Mockito.
 - Spring Data JPA
 - H2 Database
 - Lombok
-- JUnit 5, Mockito y JaCoCo
+- JUnit 5, Mockito, JaCoCo y ArchUnit
+- GitHub Actions
 
 ## Estructura principal
 
 ```text
 src/
-├── main/java/com/universidad/productosservice/
-│   ├── ProductosServiceApplication.java
-│   ├── controller/ProductoController.java
-│   ├── domain/Producto.java
-│   ├── repository/ProductoRepository.java
-│   └── service/
-│       ├── ProductoService.java
-│       └── ProductoServiceImpl.java
-└── test/java/com/universidad/productosservice/
-    ├── ProductosServiceApplicationTests.java
-    └── service/ProductoServiceImplTest.java
+|-- main/java/com/universidad/productosservice/
+|   |-- ProductosServiceApplication.java
+|   |-- controller/ProductoController.java
+|   |-- domain/Producto.java
+|   |-- repository/ProductoRepository.java
+|   `-- service/
+|       |-- ProductoService.java
+|       `-- ProductoServiceImpl.java
+`-- test/java/com/universidad/productosservice/
+    |-- ProductosServiceApplicationTests.java
+    |-- ReglasArquitectura.java
+    `-- service/ProductoServiceImplTest.java
 ```
 
 ## Ejecucion
@@ -38,10 +40,16 @@ Compilar el proyecto:
 ./mvnw compile
 ```
 
-Ejecutar pruebas unitarias y generar el reporte JaCoCo:
+Ejecutar pruebas unitarias, reglas de arquitectura y generar el reporte JaCoCo:
 
 ```bash
 ./mvnw test
+```
+
+Ejecutar solo las reglas de arquitectura:
+
+```bash
+./mvnw test -Dtest=ReglasArquitectura
 ```
 
 Iniciar la aplicacion:
@@ -80,14 +88,29 @@ La suite `ProductoServiceImplTest` cubre:
 - Actualizacion de stock.
 - Eliminacion de producto existente.
 
-Resultado de la ultima ejecucion:
-
-```text
-Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS
-```
-
-El reporte JaCoCo se genera en `target/site/jacoco/index.html`. La clase
-`ProductoServiceImpl` queda con 100% de cobertura de lineas e instrucciones.
+El reporte JaCoCo se genera en `target/site/jacoco/index.html`.
 
 ![Resultado de mvn test](docs/evidencias/mvn-test-build-success.png)
+
+## Validacion Arquitectonica
+
+La clase `ReglasArquitectura` usa ArchUnit para ejecutar cinco reglas sobre
+`com.universidad.productosservice`:
+
+1. `dominioNoDependeDeCapasAplicacion`: el paquete `domain` no depende de `controller`, `service` ni `repository`.
+2. `controladoresNoAccedenRepositorios`: los controladores no acceden directamente a repositorios.
+3. `controladoresSoloAccedenCapasPermitidas`: los controladores solo acceden a `controller`, `service`, `domain`, Spring y Java.
+4. `contratosDeServicioSonInterfaces`: los contratos de servicio que terminan en `Service` son interfaces.
+5. `repositoriosSonInterfacesJpa`: los repositorios son interfaces basadas en `JpaRepository`.
+
+El workflow `.github/workflows/arquitectura.yml` ejecuta estas reglas en cada
+push a `main` o `develop`, y tambien en pull requests hacia `main`. Despues de
+las reglas de arquitectura ejecuta la suite completa con `./mvnw verify`.
+
+## Decisiones de Arquitectura
+
+Los ADRs estan en `docs/adr/`:
+
+- `ADR-001.md`: arquitectura por capas para el microservicio de productos.
+- `ADR-002.md`: Spring Data JPA con H2 para persistencia local.
+- `ADR-003.md`: validaciones de negocio en la capa de servicio.
