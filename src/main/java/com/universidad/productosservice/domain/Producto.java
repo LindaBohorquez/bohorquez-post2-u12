@@ -1,6 +1,5 @@
 package com.universidad.productosservice.domain;
 
-import com.universidad.productosservice.repository.ProductoRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,8 +29,4 @@ public class Producto {
 
 	@Column(nullable = false)
 	private Integer stock;
-
-	public long contarProductosDesdeDominio(ProductoRepository productoRepository) {
-		return productoRepository.count();
-	}
 }
