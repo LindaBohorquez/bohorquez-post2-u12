@@ -1,0 +1,28 @@
+name: Validacion Arquitectonica
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  arquitectura:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+
+      - name: Ejecutar reglas ArchUnit
+        run: ./mvnw -B test -Dtest=ReglasArquitectura --no-transfer-progress
+
+      - name: Ejecutar suite completa
+        run: ./mvnw -B verify --no-transfer-progress
